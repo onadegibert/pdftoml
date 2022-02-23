@@ -31,13 +31,16 @@ def process(pdf, lang):
     splitter = SentenceSplitter(language=lang)
     split_file = splitter.split(text=content_processed)
 
+    # Remove empty lines
+    split_file_clean = [line for line in split_file if re.match('.*[\w].*',line)]
+
     lines_raw = len(content)
-    lines_processed = len(split_file)
+    lines_processed = len(split_file_clean)
 
     logging.info(f"Raw lines: {lines_raw}, Postprocessed lines: {lines_processed}, "
                  f"Difference: {lines_raw - lines_processed}")
 
-    return "\n".join(split_file)
+    return "\n".join(split_file_clean)
 
 def main():
     data_dir = sys.argv[1]
