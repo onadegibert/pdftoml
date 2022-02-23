@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Basic usage:  python src/pdftoml.py test out ca
 # Script to convert pdf to txt
 
@@ -13,6 +14,12 @@ from sentence_splitter import SentenceSplitter
 logging.basicConfig(level=logging.INFO)
 
 
+def clean(text):
+    clean_text = re.sub("(\s\s+)|\t", " ", text) #whitespace normalization
+    clean_text = re.sub(' ',' ',clean_text)
+    clean_text = re.sub(' ','',clean_text)
+    return (clean_text)
+
 def process(pdf, lang):
     logging.info(f"Processing file {pdf}")
     read_file = open(pdf,'rb')
@@ -23,7 +30,7 @@ def process(pdf, lang):
     # recover hyphen-splitter sentences
     pattern_line_break_1 = re.compile(r"-\n")
     # recover sentences split not preceded by a period and followed by lowercase character
-    pattern_line_break_2 = re.compile(r"(?<![.?¿!¡º])\s*\n(?=\s*[a-z])")
+    pattern_line_break_2 = re.compile(r"(?<![.?¿!¡º])\s*\n(?=\s*[a-zàáèéìíòóùú])")
 
     content_processed = pattern_line_break_1.sub("",content)
     content_processed = pattern_line_break_2.sub(" ", content_processed)
@@ -32,8 +39,11 @@ def process(pdf, lang):
     splitter = SentenceSplitter(language=lang)
     split_file = splitter.split(text=content_processed)
 
+    # Heuristic splits
+    # 1)
+
     # Remove empty lines
-    split_file_clean = [line for line in split_file if re.match('.*[\w].*',line)]
+    split_file_clean = [clean(line) for line in split_file if re.match('.*[\w].*',line) and len(line.split()) > 1]
 
     lines_raw = len(content)
     lines_processed = len(split_file_clean)
