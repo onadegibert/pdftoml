@@ -8,6 +8,7 @@ import os
 import logging
 import pdftotext
 import re
+import time
 from sentence_splitter import SentenceSplitter
 logging.basicConfig(level=logging.INFO)
 
@@ -43,6 +44,7 @@ def process(pdf, lang):
     return "\n".join(split_file_clean)
 
 def main():
+    t = time.time()
     data_dir = sys.argv[1]
     output_dir = sys.argv[2]
     lang = sys.argv[3]
@@ -53,6 +55,7 @@ def main():
         processed_file = process(pdf,lang)
         out_file = open(output_dir +'/'+pdf.name.replace('.pdf','.txt'),'w')
         out_file.write(processed_file)
+    print('Time to process PDFs: {} mins'.format(round((time.time() - t) / 60, 2)))
 
 if __name__ == "__main__":
     main()
